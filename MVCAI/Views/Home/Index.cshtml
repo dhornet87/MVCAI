@@ -1,0 +1,29 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+@model ChatGPTTestViewModel
+
+@* <form enctype="multipart/form-data" method="post">
+    <dl>
+        
+        <dd>
+            <input asp-for="Dateiupload" type="file">
+        </dd>
+    </dl>
+    <input class="btn" type="submit" value="QueryChatGPT"/>
+</form> *@
+
+@using (Html.BeginForm("QueryChatGPT", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div class="text-center">
+        <p>Überschrift</p>
+        <input asp-for="Dateiupload" type="file">
+
+        <button type="submit" >Submit</button>
+    </div>
+    
+}
+
+<div class="text-center">
+    <p>@Model.Response</p>
+</div>
