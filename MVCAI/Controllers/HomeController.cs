@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MVCAI.Models;
+using MVCAI.Services;
 using System.Diagnostics;
 
 namespace MVCAI.Controllers
@@ -26,9 +27,24 @@ namespace MVCAI.Controllers
         public async Task<IActionResult> QueryChatGPT(ChatGPTTestViewModel vm)
         {
             var newQuery = new OpenAIModel();
+            var tempfile = Path.Combine(Path.GetTempPath(),$"{Path.GetRandomFileName()}.tiff");
+            
+            using (var fs = new FileStream(tempfile, FileMode.CreateNew))
+            {
 
-            var response = await newQuery.QueryGPT(vm.Query);
-            var newvm = new ChatGPTTestViewModel { Query = vm.Query, Response = response };
+                await vm.Dateiupload.CopyToAsync(fs);
+
+            }
+
+            byte[] doc = System.IO.File.ReadAllBytes(tempfile);
+
+            var service = new OCRService();
+            var queryDoc = service.ScanDocument(doc);
+            var response = await newQuery.QueryGPT(queryDoc);
+            //response parsen für Anlage von Dokumenten
+
+            var newvm = new ChatGPTTestViewModel {Response = response };
+            System.IO.File.Delete(tempfile);
             return View("Index", newvm);
         }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
