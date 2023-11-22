@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MVCAI.Models;
 using MVCAI.Services;
+using MVCAI_Db;
 using System.Diagnostics;
 
 namespace MVCAI.Controllers
@@ -8,9 +9,11 @@ namespace MVCAI.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        public HomeController(ILogger<HomeController> logger)
+        private readonly DocumentContext _documentContext;
+        public HomeController(ILogger<HomeController> logger, DocumentContext dbContext)
         {
             _logger = logger;
+            _documentContext = dbContext;
         }
 
         public IActionResult Index()
@@ -27,6 +30,9 @@ namespace MVCAI.Controllers
         public async Task<IActionResult> QueryChatGPT(ChatGPTTestViewModel vm)
         {
             var newQuery = new OpenAIModel();
+            _documentContext.MainCategories.Add(new MVCAI_Db.Models.MainCategory { Name = "Rechnungen" });
+            await _documentContext.SaveChangesAsync();
+            
             var tempfile = Path.Combine(Path.GetTempPath(),$"{Path.GetRandomFileName()}.tiff");
             
             using (var fs = new FileStream(tempfile, FileMode.CreateNew))
@@ -37,7 +43,6 @@ namespace MVCAI.Controllers
             }
 
             byte[] doc = System.IO.File.ReadAllBytes(tempfile);
-
             var service = new OCRService();
             var queryDoc = service.ScanDocument(doc);
             var response = await newQuery.QueryGPT(queryDoc);

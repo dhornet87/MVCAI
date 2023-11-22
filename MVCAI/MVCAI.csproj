@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0-preview.1.23557.2" />
     <PackageReference Include="Azure.AI.OpenAI" Version="1.0.0-beta.9" />
     <PackageReference Include="Azure.Core" Version="1.36.0" />
     <PackageReference Include="Tesseract" Version="5.2.0" />
@@ -14,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MVCAI.ServiceDefaults\MVCAI.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\MVCAI_Db\MVCAI_Db.csproj" />
   </ItemGroup>
 
   <ItemGroup>

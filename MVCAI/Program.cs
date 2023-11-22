@@ -1,11 +1,23 @@
+using Microsoft.EntityFrameworkCore;
+using MVCAI_Db;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.AddSqlServerDbContext<DocumentContext>("SQLServer");
 
 var app = builder.Build();
+
+//Ensure Database is created and connected to Docker Container
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<DocumentContext>();
+
+    dbContext.Database.EnsureCreated();
+}
 
 app.MapDefaultEndpoints();
 
