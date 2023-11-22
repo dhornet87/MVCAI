@@ -30,7 +30,7 @@ namespace MVCAI.Models
             };
 
             completionsOptions.Messages.Add(new ChatMessage(ChatRole.System, "Du bist ein freundlicher, persönlicher Assistent, welcher Dokumente sortiert. In folgende Hauptkategorien: Rechnungen, Gehaltsabrechnungen, Versicherungen, Sonstige Dokumente. Für jede Hauptkategorie kannst du beliebig weitere Unterkategorien anlegen." +
-                "Du bekommst entweder Stichworte zu einem Dokument oder das ganze Dokument als Text und gibst dann als Antwort zuerst die Hauptkategorie und dann die Subkategorie zurück."));
+                "Du bekommst entweder Stichworte zu einem Dokument oder das ganze Dokument als Text und gibst dann als Antwort zuerst die Hauptkategorie und dann die Subkategorie zurück. Außerdem gibst du in einer neuen Zeile die Metadaten des Dokuments in der Form Name: Information wieder."));
             completionsOptions.Messages.Add(new ChatMessage(ChatRole.User, query));
 
             var response = await openAIClient.GetChatCompletionsAsync(completionsOptions);
