@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace MVCAI_Db.Models
+namespace DocumentDb.Models
 {
     public class Metadata
     {
@@ -17,6 +12,5 @@ namespace MVCAI_Db.Models
         [MaxLength(100)]
         public string Description { get; set; } = string.Empty;
         public string Details { get; set; } = string.Empty;
-
     }
 }

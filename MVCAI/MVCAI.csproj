@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -14,8 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DocumentDb\DocumentDb.csproj" />
     <ProjectReference Include="..\MVCAI.ServiceDefaults\MVCAI.ServiceDefaults.csproj" />
-    <ProjectReference Include="..\MVCAI_Db\MVCAI_Db.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -17,6 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DocumentDb\DocumentDb.csproj" />
+    <ProjectReference Include="..\DocumentService\DocumentService.csproj" />
     <ProjectReference Include="..\MVCAI\MVCAI.csproj" />
   </ItemGroup>
 

@@ -1,7 +1,8 @@
+using DocumentDb;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MVCAI.Models;
 using MVCAI.Services;
-using MVCAI_Db;
 using System.Diagnostics;
 
 namespace MVCAI.Controllers
@@ -9,16 +10,18 @@ namespace MVCAI.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly DocumentContext _documentContext;
-        public HomeController(ILogger<HomeController> logger, DocumentContext dbContext)
+        private readonly DocumentDbContext _documentContext;
+        public HomeController(ILogger<HomeController> logger, DocumentDbContext dbContext)
         {
             _logger = logger;
             _documentContext = dbContext;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var vm = new ChatGPTTestViewModel { Query = "Test", Response = "Test Repsonse" };
+            var maincategories = await _documentContext.Maincategories.ToListAsync();
+            vm.Response = maincategories.First().Name;
             return View(vm);
         }
 
@@ -30,7 +33,8 @@ namespace MVCAI.Controllers
         public async Task<IActionResult> QueryChatGPT(ChatGPTTestViewModel vm)
         {
             var newQuery = new OpenAIModel();
-            _documentContext.MainCategories.Add(new MVCAI_Db.Models.MainCategory { Name = "Rechnungen" });
+            var maincategories = await _documentContext.Maincategories.ToListAsync();
+            //vm.Response = maincategories.First().Name;
             await _documentContext.SaveChangesAsync();
             
             var tempfile = Path.Combine(Path.GetTempPath(),$"{Path.GetRandomFileName()}.tiff");
