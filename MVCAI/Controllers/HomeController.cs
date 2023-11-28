@@ -19,14 +19,21 @@ namespace MVCAI.Controllers
             _documentContext = dbContext;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var vm = new ChatGPTTestViewModel { Query = "Test", Response = "Test Repsonse" };
-            var maincategories = await _documentContext.Maincategories.ToListAsync();
-            vm.Response = maincategories.First().Name;
+            var vm = new ChatGPTTestViewModel();
+           
             return View(vm);
         }
+        public async Task<IActionResult> SaveDoc(DocumentViewModel vm, Guid id)
+        {
+            var docModel = new DocumentModel(_documentContext);
 
+            _ = await docModel.Save(vm);
+            var gptvm = new ChatGPTTestViewModel();
+
+            return View("Index", gptvm);
+        }
         public IActionResult Privacy()
         {
             return View();

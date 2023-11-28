@@ -3,15 +3,7 @@
 }
 @model ChatGPTTestViewModel
 
-@* <form enctype="multipart/form-data" method="post">
-    <dl>
-        
-        <dd>
-            <input asp-for="Dateiupload" type="file">
-        </dd>
-    </dl>
-    <input class="btn" type="submit" value="QueryChatGPT"/>
-</form> *@
+
 
 @using (Html.BeginForm("QueryChatGPT", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {

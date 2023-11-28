@@ -8,7 +8,7 @@
 @model DocumentViewModel
 
 
-@using (Html.BeginForm("NewDoc", "Home", FormMethod.Post))
+@using (Html.BeginForm("SaveDoc", "Home", FormMethod.Post, new { vm = Model, id = Model.Id}))
 {
     <div class="row row-cols-6">
         <div class="col mb-2">
@@ -17,6 +17,8 @@
         </div>
         <div class="col mb-2">
             <input asp-for="Maincategory" type="text" value="@Model.Maincategory">
+            <input asp-for="@Model.Id" type="hidden" />
+
         </div>
         <div class="col">
         </div>
@@ -32,10 +34,12 @@
         @for (int i = 0; i < Model.Metadata.Count; i++)
         {
             <div class="col mb-2">
-                <label>@Model.Metadata[i].Description</label>
+                <label >@Model.Metadata[i].Description</label>
+                <input asp-for="@Model.Metadata[i].Description" type="hidden"/>
+                <input asp-for="@Model.Metadata[i].Id" type="hidden"/>
             </div>
             <div class="col mb-2">
-                <input type="text" value="@Model.Metadata[i].Details" />
+                <input asp-for="@Model.Metadata[i].Details" type="text" value="@Model.Metadata[i].Details" />
             </div>
             <div class="col mb-2">
                 @Html.ActionLink("", "Delete", "Home", new { docId = Model.Id, metadataId = Model.Metadata[i].Id }, new { @class = "bi bi-trash" })
