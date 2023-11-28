@@ -15,15 +15,13 @@
 
 @using (Html.BeginForm("QueryChatGPT", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
-    <div class="text-center">
-        <p>Überschrift</p>
-        <input asp-for="Dateiupload" type="file">
+    <div class="d-flex flex-column justify-content-center align-items-center">
+        <h2>Upload</h2>
 
-        <button type="submit" >Submit</button>
+        <input asp-for="Dateiupload" type="file" class="mt-5">
+
+        <button type="submit" class="mt-5 bg-primary text-white" >Submit</button>
     </div>
     
 }
 
-<div class="text-center">
-    <textarea>@Model.Response</textarea>
-</div>

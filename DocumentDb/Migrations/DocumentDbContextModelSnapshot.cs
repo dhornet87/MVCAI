@@ -28,11 +28,11 @@ namespace DocumentDb.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("MainCategoryId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("MainCategoryId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("SubCategorieId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("SubCategorieId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 

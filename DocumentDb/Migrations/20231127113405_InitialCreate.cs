@@ -16,8 +16,8 @@ namespace DocumentDb.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    MainCategoryId = table.Column<int>(type: "int", nullable: false),
-                    SubCategorieId = table.Column<int>(type: "int", nullable: false)
+                    MainCategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SubCategorieId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {

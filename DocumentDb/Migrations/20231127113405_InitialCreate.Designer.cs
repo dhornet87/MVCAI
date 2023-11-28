@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DocumentDb.Migrations
 {
     [DbContext(typeof(DocumentDbContext))]
-    [Migration("20231123084530_InitialCreate")]
+    [Migration("20231127113405_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -31,11 +31,11 @@ namespace DocumentDb.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("MainCategoryId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("MainCategoryId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("SubCategorieId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("SubCategorieId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 

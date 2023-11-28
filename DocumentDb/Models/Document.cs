@@ -8,9 +8,10 @@ namespace DocumentDb.Models
         [Key]
         public Guid Id { get; set; }
         [ForeignKey("MainCategory")]
-        public int MainCategoryId { get; set; }
+        public Guid MainCategoryId { get; set; }
         [ForeignKey("SubCategory")]
 
-        public int SubCategorieId { get; set; }
+        public Guid SubCategorieId { get; set; }
+        public byte[]? File { get; set; }
     }
 }

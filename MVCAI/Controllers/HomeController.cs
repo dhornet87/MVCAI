@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using MVCAI.Models;
 using MVCAI.Services;
 using System.Diagnostics;
+using System.Drawing.Imaging;
+using Tesseract;
 
 namespace MVCAI.Controllers
 {
@@ -29,7 +31,20 @@ namespace MVCAI.Controllers
         {
             return View();
         }
+        public async Task<IActionResult> Delete(Guid docId, Guid metadataId)
+        {
+            var docModel = new DocumentModel(_documentContext);
+            
+            var doc = await docModel.GetDocument(docId);
 
+            if(await docModel.RemoveMetadata(metadataId))
+            {
+                var item = doc.Metadata.Find(x => x.Id == metadataId);
+                doc.Metadata.Remove(item);
+            }
+            
+            return View("Document", doc);
+        }
         public async Task<IActionResult> QueryChatGPT(ChatGPTTestViewModel vm)
         {
             var newQuery = new OpenAIModel();
@@ -38,23 +53,28 @@ namespace MVCAI.Controllers
             await _documentContext.SaveChangesAsync();
             
             var tempfile = Path.Combine(Path.GetTempPath(),$"{Path.GetRandomFileName()}.tiff");
-            
-            using (var fs = new FileStream(tempfile, FileMode.CreateNew))
-            {
+
+            var fs = new MemoryStream();
 
                 await vm.Dateiupload.CopyToAsync(fs);
 
-            }
 
-            byte[] doc = System.IO.File.ReadAllBytes(tempfile);
+            //To-Do: Corrss Platform?!
+            var pngFile = System.Drawing.Image.FromStream(fs);
+            var pngStream = new MemoryStream();
+            pngFile.Save(pngStream, System.Drawing.Imaging.ImageFormat.Png);
+
+
             var service = new OCRService();
-            var queryDoc = service.ScanDocument(doc);
-            var response = await newQuery.QueryGPT(queryDoc);
-            //response parsen für Anlage von Dokumenten
+            DocumentModel docmodel = new DocumentModel(_documentContext);
+            string queryDoc = service.ScanDocument(fs.ToArray());
+            string response = await newQuery.QueryGPT(queryDoc);
+            DocumentViewModel newDoc = docmodel.ParseGPTText(response);
+            newDoc.File = pngStream.ToArray();
+            DocumentViewModel newDbDoc = await docmodel.Save(newDoc);
 
-            var newvm = new ChatGPTTestViewModel {Response = response };
             System.IO.File.Delete(tempfile);
-            return View("Index", newvm);
+            return View("Document", newDbDoc);
         }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

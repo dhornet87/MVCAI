@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = "New Document";
+    string base64String = Convert.ToBase64String(Model.File, 0, Model.File.Length);
+    var imgSrc = "data:image/jpg;base64," + base64String;
+
+        }
+
+@model DocumentViewModel
+
+
+@using (Html.BeginForm("NewDoc", "Home", FormMethod.Post))
+{
+    <div class="row row-cols-6">
+        <div class="col mb-2">
+
+            <label>Hauptkategorie:</label>
+        </div>
+        <div class="col mb-2">
+            <input asp-for="Maincategory" type="text" value="@Model.Maincategory">
+        </div>
+        <div class="col">
+        </div>
+        <div class="col mb-2">
+            <label>Unterkategorie:</label>
+        </div>
+        <div class="col mb-2">
+            <input asp-for="Subcategory" type="text" value="@Model.Subcategory">
+        </div>
+        <div class="col">
+        </div>
+
+        @for (int i = 0; i < Model.Metadata.Count; i++)
+        {
+            <div class="col mb-2">
+                <label>@Model.Metadata[i].Description</label>
+            </div>
+            <div class="col mb-2">
+                <input type="text" value="@Model.Metadata[i].Details" />
+            </div>
+            <div class="col mb-2">
+                @Html.ActionLink("", "Delete", "Home", new { docId = Model.Id, metadataId = Model.Metadata[i].Id }, new { @class = "bi bi-trash" })
+            </div>
+
+        }
+        <div class="col">
+            <button type="submit" class="mt-2 bg-primary text-white">Submit</button>
+        </div>
+        <div class="col">
+            <a class="btn btn-outline-primary" onclick="toggleText()" id="toggle" data-bs-toggle="collapse" href="#collapseImage" role="button" aria-expanded="false" aria-controls="collapseImage">Show Document</a>
+        </div>
+    </div>
+}
+
+    </div>
+<div class="collapse" id="collapseImage">
+    <img src="@imgSrc" />
+    </<div>
+
+
