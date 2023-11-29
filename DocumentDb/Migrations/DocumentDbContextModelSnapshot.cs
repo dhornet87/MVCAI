@@ -28,13 +28,24 @@ namespace DocumentDb.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("MainCategoryId")
+                    b.Property<byte[]>("File")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<Guid>("MaincategoryId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("SubCategorieId")
+                    b.Property<Guid>("SubcategoryId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MaincategoryId");
+
+                    b.HasIndex("SubcategoryId");
 
                     b.ToTable("Documents");
                 });
@@ -73,7 +84,12 @@ namespace DocumentDb.Migrations
                     b.Property<Guid>("DocId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("DocumentId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("DocumentId");
 
                     b.ToTable("Metadata");
                 });
@@ -92,6 +108,37 @@ namespace DocumentDb.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Subcategories");
+                });
+
+            modelBuilder.Entity("DocumentDb.Models.Document", b =>
+                {
+                    b.HasOne("DocumentDb.Models.Maincategory", "Maincategory")
+                        .WithMany()
+                        .HasForeignKey("MaincategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DocumentDb.Models.Subcategory", "Subcategory")
+                        .WithMany()
+                        .HasForeignKey("SubcategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Maincategory");
+
+                    b.Navigation("Subcategory");
+                });
+
+            modelBuilder.Entity("DocumentDb.Models.Metadata", b =>
+                {
+                    b.HasOne("DocumentDb.Models.Document", null)
+                        .WithMany("Metadatas")
+                        .HasForeignKey("DocumentId");
+                });
+
+            modelBuilder.Entity("DocumentDb.Models.Document", b =>
+                {
+                    b.Navigation("Metadatas");
                 });
 #pragma warning restore 612, 618
         }

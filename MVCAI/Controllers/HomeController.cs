@@ -19,9 +19,12 @@ namespace MVCAI.Controllers
             _documentContext = dbContext;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var vm = new ChatGPTTestViewModel();
+            var vm = new HomeViewModel();
+            var docModel = new DocumentModel(_documentContext);
+
+            vm.Documents = await docModel.GetDocuments();
            
             return View(vm);
         }
@@ -30,9 +33,11 @@ namespace MVCAI.Controllers
             var docModel = new DocumentModel(_documentContext);
 
             _ = await docModel.Save(vm);
-            var gptvm = new ChatGPTTestViewModel();
+            var vmHome = new HomeViewModel();
 
-            return View("Index", gptvm);
+            vmHome.Documents = await docModel.GetDocuments();
+
+            return View("Index",vmHome);
         }
         public IActionResult Privacy()
         {
@@ -52,14 +57,20 @@ namespace MVCAI.Controllers
             
             return View("Document", doc);
         }
-        public async Task<IActionResult> QueryChatGPT(ChatGPTTestViewModel vm)
+        public async Task<IActionResult> ViewDocument(Guid docId)
+        {
+            var docModel = new DocumentModel(_documentContext);
+
+            var vm = await docModel.GetDocument(docId);
+
+            return View("Document", vm);
+        }
+        public async Task<IActionResult> QueryChatGPT(HomeViewModel vm)
         {
             var newQuery = new OpenAIModel();
             var maincategories = await _documentContext.Maincategories.ToListAsync();
-            //vm.Response = maincategories.First().Name;
             await _documentContext.SaveChangesAsync();
             
-            var tempfile = Path.Combine(Path.GetTempPath(),$"{Path.GetRandomFileName()}.tiff");
 
             var fs = new MemoryStream();
 
@@ -80,7 +91,6 @@ namespace MVCAI.Controllers
             newDoc.File = pngStream.ToArray();
             DocumentViewModel newDbDoc = await docmodel.Save(newDoc);
 
-            System.IO.File.Delete(tempfile);
             return View("Document", newDbDoc);
         }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

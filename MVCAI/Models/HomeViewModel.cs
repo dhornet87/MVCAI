@@ -1,15 +1,17 @@
 ﻿
 namespace MVCAI.Models
 {
-    public class ChatGPTTestViewModel
+    public class HomeViewModel
     {
         public string Query { get; set; } = string.Empty;
 
         public string Response { get; set; } = string.Empty;
         public IFormFile Dateiupload { get; set; }
 
+        public List<DocumentViewModel> Documents { get; set; }
 
-        public ChatGPTTestViewModel()
+
+        public HomeViewModel()
         {
                 
         }
@@ -29,4 +31,6 @@ namespace MVCAI.Models
             throw new NotImplementedException();
         }
     }
+
+ 
 }

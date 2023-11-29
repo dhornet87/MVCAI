@@ -2,6 +2,7 @@
 using DocumentDb;
 using DocumentDb.Models;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel;
 using Tesseract;
 
 namespace MVCAI.Models
@@ -10,7 +11,25 @@ namespace MVCAI.Models
     {
         private DocumentDbContext _documentContext => documentContext;
 
+        public async Task<List<DocumentViewModel>> GetDocuments()
+        {
+            var list = await _documentContext.Documents.Include(x => x.Maincategory).Include(x => x.Subcategory).Include(x => x.Metadatas).ToListAsync();
+            var returnlist = new List<DocumentViewModel>();
+            foreach (var item in list)
+            {
+               returnlist.Add( new DocumentViewModel
+                {
+                    Id = item.Id,
+                    Maincategory = item.Maincategory.Name,
+                    Subcategory = item.Subcategory.Name,
+                    Metadata = item.Metadatas.Select(x => new MetadataViewModel { Description = x.Description, Details = x.Details, Id = x.Id }).ToList()
+                });
+            }
 
+            return returnlist;
+
+
+        }
         public DocumentViewModel ParseGPTText(string documentText)
         {
             var newDoc = new DocumentViewModel();
@@ -20,6 +39,10 @@ namespace MVCAI.Models
 
             for (int i = 0; i < linearray.Length; i++)
             {
+                if (linearray[i].StartsWith("Titel"))
+                {
+
+                }
                 if (linearray[i].StartsWith("Hauptkategorie"))
                 {
                     newDoc.Maincategory = linearray[i].Split(':')[1];
@@ -52,7 +75,7 @@ namespace MVCAI.Models
             if(doc == null)
             {
                 
-                doc = new Document { MainCategoryId = mainCatId, SubCategorieId = subCatId, File = documentVM.File };
+                doc = new Document { MaincategoryId = mainCatId, SubcategoryId = subCatId, File = documentVM.File };
                 await _documentContext.AddAsync(doc);
 
                 await _documentContext.SaveChangesAsync();
@@ -69,8 +92,8 @@ namespace MVCAI.Models
         public async Task<DocumentViewModel> GetDocument(Guid id)
         {
             var doc = await _documentContext.Documents.FindAsync(id);
-            var mainCat = await _documentContext.Maincategories.FindAsync(doc.MainCategoryId);
-            var subCat = await _documentContext.Subcategories.FindAsync(doc.SubCategorieId);
+            var mainCat = await _documentContext.Maincategories.FindAsync(doc.MaincategoryId);
+            var subCat = await _documentContext.Subcategories.FindAsync(doc.SubcategoryId);
 
             var metadataList = await _documentContext.Metadata.Where(x => x.DocId == doc.Id).Select(x => new MetadataViewModel { Description = x.Description, Details = x.Details, Id = x.Id }).ToListAsync();
             return new DocumentViewModel
@@ -108,8 +131,19 @@ namespace MVCAI.Models
         {
             foreach (var item in metadata)
             {
-                var newMetadata = new Metadata { Description = item.Description, Details = item.Details, DocId = docId };
-                await _documentContext.Metadata.AddAsync(newMetadata);
+                
+                var metaData = await _documentContext.Metadata.FindAsync(item.Id);
+
+                if(metaData == null)
+                {
+                    metaData = new Metadata { Description = item.Description, Details = item.Details, DocId = docId };
+                    await _documentContext.Metadata.AddAsync(metaData);
+                }
+                else
+                {
+                    metaData.Details = item.Details;
+                    _documentContext.Metadata.Update(metaData);
+                }
             }
 
             await _documentContext.SaveChangesAsync();
