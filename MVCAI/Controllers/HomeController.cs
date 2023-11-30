@@ -4,8 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using MVCAI.Models;
 using MVCAI.Services;
 using System.Diagnostics;
-using System.Drawing.Imaging;
-using Tesseract;
 
 namespace MVCAI.Controllers
 {
@@ -28,43 +26,13 @@ namespace MVCAI.Controllers
            
             return View(vm);
         }
-        public async Task<IActionResult> SaveDoc(DocumentViewModel vm, Guid id)
-        {
-            var docModel = new DocumentModel(_documentContext);
-
-            _ = await docModel.Save(vm);
-            var vmHome = new HomeViewModel();
-
-            vmHome.Documents = await docModel.GetDocuments();
-
-            return View("Index",vmHome);
-        }
+        
         public IActionResult Privacy()
         {
             return View();
         }
-        public async Task<IActionResult> Delete(Guid docId, Guid metadataId)
-        {
-            var docModel = new DocumentModel(_documentContext);
-            
-            var doc = await docModel.GetDocument(docId);
+        
 
-            if(await docModel.RemoveMetadata(metadataId))
-            {
-                var item = doc.Metadata.Find(x => x.Id == metadataId);
-                doc.Metadata.Remove(item);
-            }
-            
-            return View("Document", doc);
-        }
-        public async Task<IActionResult> ViewDocument(Guid docId)
-        {
-            var docModel = new DocumentModel(_documentContext);
-
-            var vm = await docModel.GetDocument(docId);
-
-            return View("Document", vm);
-        }
         public async Task<IActionResult> QueryChatGPT(HomeViewModel vm)
         {
             var newQuery = new OpenAIModel();
@@ -86,12 +54,13 @@ namespace MVCAI.Controllers
             var service = new OCRService();
             DocumentModel docmodel = new DocumentModel(_documentContext);
             string queryDoc = service.ScanDocument(fs.ToArray());
-            string response = await newQuery.QueryGPT(queryDoc);
-            DocumentViewModel newDoc = docmodel.ParseGPTText(response);
+            //To Do Kategorie auswählbar machen 
+            DocumentViewModel newDoc = await OpenAIModel.QueryGPT(queryDoc, "Rechnung");
             newDoc.File = pngStream.ToArray();
+            newDoc.Hauptkategorie = "Rechnung";
             DocumentViewModel newDbDoc = await docmodel.Save(newDoc);
 
-            return View("Document", newDbDoc);
+            return RedirectToAction("Index","Document", new { id = newDbDoc.Id});
         }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

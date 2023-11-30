@@ -3,19 +3,30 @@
     public class DocumentViewModel
     {
         public Guid Id { get; set; }
-        public string Maincategory { get; set; } = string.Empty;
-        public string Subcategory { get; set; } = string.Empty;
+        public string Titel { get; set; }
+        public string Hauptkategorie { get; set; } = string.Empty;
+        public string Unterkategorie { get; set; } = string.Empty;
         public byte[] File { get; set; }
 
-        public List<MetadataViewModel> Metadata { get; set; }
+        public List<MetadataViewModel> Metadaten { get; set; } = new List<MetadataViewModel>();
+        public List<ToDoViewModel> ToDos { get; set; } = new List<ToDoViewModel>();
     }
 
 public class MetadataViewModel
 {
         public Guid Id { get; set; }
-        public string Description { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
         public string Details { get; set; } = string.Empty;
 
 
+    }
+
+    public class ToDoViewModel
+    {
+        public Guid Id { get; set; }
+        public string Titel { get; set; }
+        public string Beschreibung { get; set; }
+        public string Faelligkeit { get; set; }
+        public bool Erledigt { get; set; } = false;
     }
 }

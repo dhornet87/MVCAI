@@ -13,7 +13,7 @@ namespace DocumentDb.Models
         public Subcategory Subcategory { get; set; }
         public Guid SubcategoryId { get; set; }
         public byte[]? File { get; set; }
-
+        public ICollection<ToDo>? ToDos { get; set; }
         public ICollection<Metadata>? Metadatas { get; set; }
     }
 }

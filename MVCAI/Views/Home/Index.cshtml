@@ -20,11 +20,11 @@
 }
 <div class="mt-10">
     <table class="table">
-        <thead>
+        <thead class="table-dark">
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">Maincategory</th>
-                <th scope="col">Subcategory</th>
+                <th scope="col">Titel</th>
+                <th scope="col">Kategorie</th>
                 <th scope="col">Actions</th>
             </tr>
         </thead>
@@ -33,12 +33,32 @@
             {
                 <tr>
                     <th scope="row">@(i + 1)</th>
-                    <td>@Model.Documents[i].Maincategory</td>
-                    <td>@Model.Documents[i].Subcategory</td>
+                    <td>@Model.Documents[i].Titel</td>
+                    <td>@Model.Documents[i].Hauptkategorie</td>
                     <td>
-                        @Html.ActionLink("View", "ViewDocument", "Home", new { docId = Model.Documents[i].Id })
-
+                        @Html.ActionLink("View", "Index", "Document", new { id = Model.Documents[i].Id })
+                        @Html.ActionLink("Delete", "DeleteDocument", "Home", new { docId = Model.Documents[i].Id })
                     </td>
+                    
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Titel</th>
+                                    <th scope="col">Beschreibung</th>
+                                    <th scope="col">Faelligkeit</th>
+                                    <th scope="col">Erledigt</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @for (int j = 0; j < @Model.Documents[i].ToDos.Count; j++)
+                            {
+                                <tr>
+
+                                </tr>
+                    }
+                                </tbody>
+                        </table>
                 </tr>
             }
         </tbody>

@@ -110,6 +110,39 @@ namespace DocumentDb.Migrations
                     b.ToTable("Subcategories");
                 });
 
+            modelBuilder.Entity("DocumentDb.Models.ToDo", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Details")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("DocId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("DocumentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Done")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentId");
+
+                    b.ToTable("ToDos");
+                });
+
             modelBuilder.Entity("DocumentDb.Models.Document", b =>
                 {
                     b.HasOne("DocumentDb.Models.Maincategory", "Maincategory")
@@ -136,9 +169,18 @@ namespace DocumentDb.Migrations
                         .HasForeignKey("DocumentId");
                 });
 
+            modelBuilder.Entity("DocumentDb.Models.ToDo", b =>
+                {
+                    b.HasOne("DocumentDb.Models.Document", null)
+                        .WithMany("ToDos")
+                        .HasForeignKey("DocumentId");
+                });
+
             modelBuilder.Entity("DocumentDb.Models.Document", b =>
                 {
                     b.Navigation("Metadatas");
+
+                    b.Navigation("ToDos");
                 });
 #pragma warning restore 612, 618
         }

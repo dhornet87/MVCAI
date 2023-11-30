@@ -1,6 +1,7 @@
 ﻿
 using DocumentDb;
 using DocumentDb.Models;
+using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using Tesseract;
@@ -17,12 +18,12 @@ namespace MVCAI.Models
             var returnlist = new List<DocumentViewModel>();
             foreach (var item in list)
             {
-               returnlist.Add( new DocumentViewModel
+                returnlist.Add(new DocumentViewModel
                 {
                     Id = item.Id,
-                    Maincategory = item.Maincategory.Name,
-                    Subcategory = item.Subcategory.Name,
-                    Metadata = item.Metadatas.Select(x => new MetadataViewModel { Description = x.Description, Details = x.Details, Id = x.Id }).ToList()
+                    Hauptkategorie = item.Maincategory.Name,
+                    Unterkategorie = item.Subcategory.Name,
+                    Titel = item.Title
                 });
             }
 
@@ -45,11 +46,11 @@ namespace MVCAI.Models
                 }
                 if (linearray[i].StartsWith("Hauptkategorie"))
                 {
-                    newDoc.Maincategory = linearray[i].Split(':')[1];
+                    newDoc.Hauptkategorie = linearray[i].Split(':')[1];
                 }
                 if (linearray[i].StartsWith("Unterkategorie"))
                 {
-                    newDoc.Subcategory = linearray[i].Split(':')[1];
+                    newDoc.Unterkategorie = linearray[i].Split(':')[1];
                 }
 
                 if (linearray[i].StartsWith('-'))
@@ -58,33 +59,39 @@ namespace MVCAI.Models
                 }
             }
 
-            newDoc.Metadata = metadata;
+            newDoc.Metadaten = metadata;
 
 
             return newDoc;
         }
-       
+
 
         public async Task<DocumentViewModel> Save(DocumentViewModel documentVM)
         {
-            var mainCatId = await SaveMaincategory(documentVM.Maincategory);
-            var subCatId = await SaveSubcategory(documentVM.Subcategory);
+            var mainCatId = await SaveMaincategory(documentVM.Hauptkategorie);
+            var subCatId = await SaveSubcategory(documentVM.Unterkategorie);
 
             var doc = await _documentContext.Documents.FindAsync(documentVM.Id);
 
-            if(doc == null)
+            if (doc == null)
             {
-                
-                doc = new Document { MaincategoryId = mainCatId, SubcategoryId = subCatId, File = documentVM.File };
+
+                doc = new Document { MaincategoryId = mainCatId, SubcategoryId = subCatId, File = documentVM.File, Title = documentVM.Titel ?? "Platzhalter" };
                 await _documentContext.AddAsync(doc);
 
-                await _documentContext.SaveChangesAsync();
+            }
+            else
+            {
+                doc.Title = documentVM.Titel;
+
             }
 
+            await _documentContext.SaveChangesAsync();
+
             documentVM.Id = doc.Id;
-
-            documentVM.Metadata = await SaveMetadata(documentVM.Metadata, documentVM.Id);
-
+            
+            documentVM.Metadaten = await SaveMetadata(documentVM.Metadaten, documentVM.Id);
+            documentVM.ToDos = await SaveToDos(documentVM.ToDos, documentVM.Id);
             return documentVM;
 
         }
@@ -95,14 +102,17 @@ namespace MVCAI.Models
             var mainCat = await _documentContext.Maincategories.FindAsync(doc.MaincategoryId);
             var subCat = await _documentContext.Subcategories.FindAsync(doc.SubcategoryId);
 
-            var metadataList = await _documentContext.Metadata.Where(x => x.DocId == doc.Id).Select(x => new MetadataViewModel { Description = x.Description, Details = x.Details, Id = x.Id }).ToListAsync();
+            var metadataList = await _documentContext.Metadata.Where(x => x.DocId == doc.Id).Select(x => new MetadataViewModel { Name = x.Description, Details = x.Details, Id = x.Id }).ToListAsync();
+            var todoList = await _documentContext.ToDos.Where(x => x.DocId == doc.Id).Select(x => new ToDoViewModel { Titel = x.Title, Beschreibung = x.Details, Id = x.Id, Erledigt = x.Done, Faelligkeit = x.DueDate.ToString("dd.MM.yyyy") }).ToListAsync();
             return new DocumentViewModel
             {
                 Id = doc.Id,
-                Maincategory = mainCat.Name,
-                Subcategory = subCat.Name,
-                Metadata = metadataList,
-                File = doc.File
+                Hauptkategorie = mainCat.Name,
+                Unterkategorie = subCat.Name,
+                Metadaten = metadataList,
+                ToDos = todoList,
+                File = doc.File,
+                Titel = doc.Title
             };
         }
 
@@ -115,7 +125,7 @@ namespace MVCAI.Models
             var result = await _documentContext.SaveChangesAsync();
 
             if (result > 0)
-            { 
+            {
                 return true;
             }
             else
@@ -127,16 +137,51 @@ namespace MVCAI.Models
 
 
         }
+        private async Task<List<ToDoViewModel>> SaveToDos(List<ToDoViewModel> todos, Guid docId)
+        {
+            if(todos == null)
+            {
+                return new List<ToDoViewModel>();
+            }
+            foreach (var item in todos)
+            {
+
+                var todoItem = await _documentContext.ToDos.FindAsync(item.Id);
+
+                if (todoItem == null)
+                {
+                    todoItem = new ToDo { Title = item.Titel, Details = item.Beschreibung, DocId = docId, Done = item.Erledigt };
+                    if (DateTime.TryParse(item.Faelligkeit, out var date))
+                    {
+                        todoItem.DueDate = date;
+                    }
+                    await _documentContext.ToDos.AddAsync(todoItem);
+                }
+                else
+                {
+                    todoItem.Details = item.Beschreibung;
+                    todoItem.Title = item.Titel;
+                    todoItem.Done = item.Erledigt;
+                    _documentContext.ToDos.Update(todoItem);
+                }
+            }
+
+            await _documentContext.SaveChangesAsync();
+
+            var newMetadataDb =
+                await _documentContext.ToDos.Where(x => x.DocId == docId).Select(x => new ToDoViewModel { Titel = x.Title, Beschreibung = x.Details, Id = x.Id, Faelligkeit = x.DueDate.ToString("dd.MM.yyyy"), Erledigt = x.Done }).ToListAsync();
+            return newMetadataDb;
+        }
         private async Task<List<MetadataViewModel>> SaveMetadata(List<MetadataViewModel> metadata, Guid docId)
         {
             foreach (var item in metadata)
             {
-                
+
                 var metaData = await _documentContext.Metadata.FindAsync(item.Id);
 
-                if(metaData == null)
+                if (metaData == null)
                 {
-                    metaData = new Metadata { Description = item.Description, Details = item.Details, DocId = docId };
+                    metaData = new DocumentDb.Models.Metadata { Description = item.Name, Details = item.Details, DocId = docId };
                     await _documentContext.Metadata.AddAsync(metaData);
                 }
                 else
@@ -149,8 +194,8 @@ namespace MVCAI.Models
             await _documentContext.SaveChangesAsync();
 
             var newMetadataDb =
-                await _documentContext.Metadata.Where(x => x.DocId == docId).Select(x => new MetadataViewModel { Description = x.Description, Details = x.Details, Id = x.Id }).ToListAsync();
-            return newMetadataDb; 
+                await _documentContext.Metadata.Where(x => x.DocId == docId).Select(x => new MetadataViewModel { Name = x.Description, Details = x.Details, Id = x.Id }).ToListAsync();
+            return newMetadataDb;
         }
         private async Task<Guid> SaveMaincategory(string name)
         {
@@ -193,7 +238,7 @@ namespace MVCAI.Models
             return metadataarray == null || metadataarray.Length < 2 ? new MetadataViewModel() :
             new MetadataViewModel
             {
-                Description = metadataarray[0].Trim(),
+                Name = metadataarray[0].Trim(),
                 Details = metadataarray[1].Trim()
             };
         }

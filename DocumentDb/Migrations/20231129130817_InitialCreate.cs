@@ -82,6 +82,28 @@ namespace DocumentDb.Migrations
                         principalColumn: "Id");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ToDos",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DocId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Details = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Done = table.Column<bool>(type: "bit", nullable: false),
+                    DocumentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ToDos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ToDos_Documents_DocumentId",
+                        column: x => x.DocumentId,
+                        principalTable: "Documents",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Documents_MaincategoryId",
                 table: "Documents",
@@ -96,6 +118,11 @@ namespace DocumentDb.Migrations
                 name: "IX_Metadata_DocumentId",
                 table: "Metadata",
                 column: "DocumentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ToDos_DocumentId",
+                table: "ToDos",
+                column: "DocumentId");
         }
 
         /// <inheritdoc />
@@ -103,6 +130,9 @@ namespace DocumentDb.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Metadata");
+
+            migrationBuilder.DropTable(
+                name: "ToDos");
 
             migrationBuilder.DropTable(
                 name: "Documents");

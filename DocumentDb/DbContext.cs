@@ -9,5 +9,6 @@ namespace DocumentDb
         public DbSet<Maincategory> Maincategories { get; set; }
         public DbSet<Subcategory> Subcategories { get; set; }
         public DbSet<Metadata> Metadata { get; set; }
+        public DbSet<ToDo> ToDos { get; set; }
     }
 }

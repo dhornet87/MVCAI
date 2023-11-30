@@ -70,7 +70,7 @@
                                 <label for="@i">@Model.Metadaten[i].Name</label>
                             </div>
                             @* @Html.ActionLink("Delete", "Delete", "Home", new { docId = Model.Id, metadataId = Model.Metadaten[i].Id }, new { @class = " text-center btn btn-outline-primary " }) *@
-                            <button type="submit" asp-action="Delete" asp-controller="Home" asp-route-docId="@Model.Id" asp-route-metadataId="@Model.Metadaten[i].Id" class="btn btn-outline-primary bi bi-trash-fill"></button>
+                            <button type="submit" asp-action="Delete" asp-controller="Document" asp-route-docId="@Model.Id" asp-route-metadataId="@Model.Metadaten[i].Id" class="btn btn-outline-primary bi bi-trash-fill"></button>
                         </div>
                     </div>
                 }
@@ -105,22 +105,22 @@
                 </div>
             }
         </fieldset>
-         <fieldset class="border rounded-3 p-3 mb-5">
+        <fieldset class="border rounded-3 p-3 mb-5">
             <legend class="float-none w-auto px-3">Actions</legend>
-        <div class="row">
-            <div class="col-auto">
+            <div class="row">
+                <div class="col-auto">
                     <button type="submit" class="btn btn-outline-primary mt-2">Submit</button>
-            </div>
-            <div class="col-auto">
-                <button type="button" class="btn btn-outline-primary mt-2" onclick="toggleText()" id="toggle" data-bs-toggle="collapse" href="#collapseImage" role="button" aria-expanded="false" aria-controls="collapseImage">Show Document</button>
-            </div>
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-outline-primary mt-2" onclick="toggleText()" id="toggle" data-bs-toggle="collapse" href="#collapseImage" role="button" aria-expanded="false" aria-controls="collapseImage">Show Document</button>
+                </div>
                 <div class="col-auto">
                     <button type="button" class="btn btn-outline-primary mt-2">Add Metadata</button>
                 </div>
                 <div class="col-auto">
                     <button type="button" class="btn btn-outline-primary mt-2">Add Todo</button>
                 </div>
-        </div>
+            </div>
         </fieldset>
     }
 </div>
