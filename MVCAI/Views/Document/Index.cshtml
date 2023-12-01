@@ -9,7 +9,7 @@
 
 <div class="container-fluid">
 
-    @using (Html.BeginForm("SaveDoc", "Home", FormMethod.Post, new { vm = @Model, id = Model.Id }))
+    @using (Html.BeginForm("SaveDoc", "Document", FormMethod.Post, new { vm = @Model, id = Model.Id }))
     {
         <fieldset class="border rounded-3 p-3 mb-5">
             <legend class="float-none w-auto px-3">Maindata</legend>
@@ -19,7 +19,7 @@
 
 
 
-                    <input id="titel" class="form-control" asp-for="@Model.Titel" type="text" value="@Model.Titel">
+                    <input required id="titel" class="form-control" asp-for="@Model.Titel" type="text" value="@Model.Titel">
                     <label for="titel">Titel</label>
                     <input asp-for="@Model.Id" type="hidden" />
                     <input asp-for="@Model.File" type="hidden" />
@@ -30,14 +30,14 @@
 
 
 
-                    <input id="hauptKat" class="form-control" readonly asp-for="Hauptkategorie" type="text" value="@Model.Hauptkategorie">
+                    <input required id="hauptKat" class="form-control" asp-for="Hauptkategorie" type="text" value="@Model.Hauptkategorie">
                     <label for="hauptKat">Hauptkategorie</label>
                 </div>
 
 
                 <div class="form-floating col-auto gx-1">
 
-                    <input id="unterkategorie" class="form-control" readonly asp-for="Unterkategorie" type="text" value="@Model.Unterkategorie">
+                    <input required id="unterkategorie" class="form-control" asp-for="Unterkategorie" type="text" value="@Model.Unterkategorie">
                     <label for="unterkategorie" class="form-label">Unterkategorie</label>
                 </div>
             </div>
@@ -60,11 +60,11 @@
                                 @if (@Model.Metadaten[i].Details.Count() > 40)
                                 {
 
-                                    <textarea id="@i" class="form-control" asp-for="@Model.Metadaten[i].Details" cols="50" aria-describedby="@("delete"+@i)">@Model.Metadaten[i].Details</textarea>
+                                    <textarea required id="@i" class="form-control" asp-for="@Model.Metadaten[i].Details" cols="70" aria-describedby="@("delete"+@i)">@Model.Metadaten[i].Details</textarea>
                                 }
                                 else
                                 {
-                                    <input id="@i" class="form-control" asp-for="@Model.Metadaten[i].Details" type="text" value="@Model.Metadaten[i].Details" aria-describedby="@("delete"+@i)">
+                                    <input required id="@i" class="form-control" asp-for="@Model.Metadaten[i].Details" type="text" value="@Model.Metadaten[i].Details" aria-describedby="@("delete"+@i)">
 
                                 }
                                 <label for="@i">@Model.Metadaten[i].Name</label>
@@ -80,27 +80,30 @@
             <legend class="float-none w-auto px-3">ToDos</legend>
             @for (int i = 0; i < Model.ToDos.Count; i++)
             {
-                <div class="row">
+                <div class="row mb-3">
                     <div class="form-floating col-auto gx-1">
 
 
 
                         <input class="form-control" asp-for="@Model.ToDos[i].Id" type="hidden" />
-                        <input id="todo-titel" class="form-control" asp-for="@Model.ToDos[i].Titel" type="text" value="@Model.ToDos[i].Titel" />
-                        <label for="todo-titel" class="form-label">Titel</label>
+                        <input required id="todo-titel" class="form-control" asp-for="@Model.ToDos[i].Titel" type="text" value="@Model.ToDos[i].Titel" />
+                        <label for="todo-titel" class="form-label">Title</label>
 
 
 
                     </div>
                     <div class=" form-floating col-auto gx-1">
-                        <input id="todo-beschreibung" class="form-control" asp-for="@Model.ToDos[i].Beschreibung" type="text" value="@Model.ToDos[i].Beschreibung" />
-                        <label for="todo-beschreibung" class="form-label">Beschreibung</label>
+                        <textarea required id="todo-beschreibung" class="form-control" asp-for="@Model.ToDos[i].Beschreibung" cols="70" value="@Model.ToDos[i].Beschreibung" ></textarea>
+                        <label for="todo-beschreibung" class="form-label">Description</label>
 
 
                     </div>
                     <div class="form-floating col-auto gx-1">
-                        <input id="todo-faelligkeit" class="form-control" asp-for="@Model.ToDos[i].Faelligkeit" type="text" value="@Model.ToDos[i].Faelligkeit" />
-                        <label for="todo-faelligkeit" class="form-label">Faelligkeit</label>
+                        <input required id="todo-faelligkeit" class="form-control" asp-for="@Model.ToDos[i].Faelligkeit" type="text" value="@Model.ToDos[i].Faelligkeit" />
+                        <label for="todo-faelligkeit" class="form-label">Due Date</label>
+                    </div>
+                    <div class="col-auto gx-1 mt-2 ml-3">
+                        <button class="btn btn-outline-primary bi bi-trash-fill" asp-action="DeleteTodo" asp-controller="Document" asp-route-docId="@Model.Id" asp-route-todoId="@Model.ToDos[i].Id"></button>
                     </div>
                 </div>
             }
@@ -109,16 +112,27 @@
             <legend class="float-none w-auto px-3">Actions</legend>
             <div class="row">
                 <div class="col-auto">
-                    <button type="submit" class="btn btn-outline-primary mt-2">Submit</button>
+                    <button type="submit" class="btn btn-outline-primary mt-2">Save</button>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-outline-primary mt-2" asp-action="Index" asp-controller="Home">Back Home</button>
                 </div>
                 <div class="col-auto">
                     <button type="button" class="btn btn-outline-primary mt-2" onclick="toggleText()" id="toggle" data-bs-toggle="collapse" href="#collapseImage" role="button" aria-expanded="false" aria-controls="collapseImage">Show Document</button>
                 </div>
                 <div class="col-auto">
-                    <button type="button" class="btn btn-outline-primary mt-2">Add Metadata</button>
+                    <button type="submit" asp-action="AddTodo" asp-controller="Document" asp-route-id="@Model.Id" class="btn btn-outline-primary mt-2">Add Todo</button>
                 </div>
                 <div class="col-auto">
-                    <button type="button" class="btn btn-outline-primary mt-2">Add Todo</button>
+
+                    <div class="input-group">
+
+
+                        <button type="submit" id="addmetadatabtn" asp-action="AddMetaData" asp-controller="Document" asp-route-metadataNamePlatzhalter="@Model.MetadataNamePlatzhalter" asp-route-docId="@Model.Id" class="btn btn-outline-primary mt-2">Add Metadata</button>
+                        <input type="text" class="form-control" asp-for="@Model.MetadataNamePlatzhalter" id="platzhalter" aria-label="new Metadataname" aria-describedby="addmetadatabtn" value="@Model.MetadataNamePlatzhalter" />
+                        @* <label for="platzhalter" class="form-label">Metadata-Name</label> *@
+
+                    </div>
                 </div>
             </div>
         </fieldset>

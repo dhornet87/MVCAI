@@ -69,17 +69,17 @@ namespace DocumentDb.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DocId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Details = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DocumentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    Details = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Metadata", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Metadata_Documents_DocumentId",
-                        column: x => x.DocumentId,
+                        name: "FK_Metadata_Documents_DocId",
+                        column: x => x.DocId,
                         principalTable: "Documents",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -90,18 +90,18 @@ namespace DocumentDb.Migrations
                     DocId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Details = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Done = table.Column<bool>(type: "bit", nullable: false),
-                    DocumentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Done = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ToDos", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ToDos_Documents_DocumentId",
-                        column: x => x.DocumentId,
+                        name: "FK_ToDos_Documents_DocId",
+                        column: x => x.DocId,
                         principalTable: "Documents",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -115,14 +115,14 @@ namespace DocumentDb.Migrations
                 column: "SubcategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Metadata_DocumentId",
+                name: "IX_Metadata_DocId",
                 table: "Metadata",
-                column: "DocumentId");
+                column: "DocId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ToDos_DocumentId",
+                name: "IX_ToDos_DocId",
                 table: "ToDos",
-                column: "DocumentId");
+                column: "DocId");
         }
 
         /// <inheritdoc />

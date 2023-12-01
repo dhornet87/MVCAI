@@ -23,6 +23,7 @@ namespace MVCAI.Controllers
             var docModel = new DocumentModel(_documentContext);
 
             vm.Documents = await docModel.GetDocuments();
+            vm.ToDos = await docModel.GetTodos();
            
             return View(vm);
         }
@@ -32,9 +33,21 @@ namespace MVCAI.Controllers
             return View();
         }
         
+        public IActionResult ViewDocument(Guid id)
+        {
+            return RedirectToAction("Index", "Document", new { id = id });
+        }
 
+        public async Task<IActionResult> ToDoDone(Guid id)
+        {
+            var docModel = new DocumentModel(_documentContext);
+
+            await docModel.SetToDoDone(id);
+            return RedirectToAction("Index");
+        }
         public async Task<IActionResult> QueryChatGPT(HomeViewModel vm)
         {
+            
             var newQuery = new OpenAIModel();
             var maincategories = await _documentContext.Maincategories.ToListAsync();
             await _documentContext.SaveChangesAsync();
@@ -55,9 +68,8 @@ namespace MVCAI.Controllers
             DocumentModel docmodel = new DocumentModel(_documentContext);
             string queryDoc = service.ScanDocument(fs.ToArray());
             //To Do Kategorie auswählbar machen 
-            DocumentViewModel newDoc = await OpenAIModel.QueryGPT(queryDoc, "Rechnung");
+            DocumentViewModel newDoc = await OpenAIModel.QueryGPT(queryDoc);
             newDoc.File = pngStream.ToArray();
-            newDoc.Hauptkategorie = "Rechnung";
             DocumentViewModel newDbDoc = await docmodel.Save(newDoc);
 
             return RedirectToAction("Index","Document", new { id = newDbDoc.Id});

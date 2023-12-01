@@ -17,7 +17,7 @@ namespace MVCAI_Test
             byte[] doc = File.ReadAllBytes("./data/rechnung.tiff");
             
             var result = ocrengine.ScanDocument(doc);
-            string response = await OpenAIModel.QueryGPT(result, "Rechnung");
+            var response = await OpenAIModel.QueryGPT(result);
 
             Assert.NotNull(result);
             Assert.NotNull(response);

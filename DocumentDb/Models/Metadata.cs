@@ -12,5 +12,7 @@ namespace DocumentDb.Models
         [MaxLength(100)]
         public string Description { get; set; } = string.Empty;
         public string Details { get; set; } = string.Empty;
+
+        public Document Document { get; set; }
     }
 }

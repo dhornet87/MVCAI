@@ -12,9 +12,21 @@ namespace MVCAI.Models
     {
         private DocumentDbContext _documentContext => documentContext;
 
+        public async Task<List<ToDoViewModel>> GetTodos()
+        {
+            var list = await _documentContext.ToDos.OrderBy(x => x.DueDate).ThenBy(x => x.Done).ToListAsync();
+
+            return list.Select(x => new ToDoViewModel { Titel = x.Title, Beschreibung = x.Details, Id = x.Id, DocId = x.DocId, Erledigt = x.Done, Faelligkeit = x.DueDate.Value.ToString("dd.MM.yyyy") }).ToList();
+        }
         public async Task<List<DocumentViewModel>> GetDocuments()
         {
-            var list = await _documentContext.Documents.Include(x => x.Maincategory).Include(x => x.Subcategory).Include(x => x.Metadatas).ToListAsync();
+            var list = await _documentContext.Documents
+                .Include(x => x.Maincategory)
+                .Include(x => x.Subcategory)
+                .Include(x => x.ToDos)
+                .Include(x => x.Metadatas)
+                .ToListAsync();
+
             var returnlist = new List<DocumentViewModel>();
             foreach (var item in list)
             {
@@ -23,12 +35,31 @@ namespace MVCAI.Models
                     Id = item.Id,
                     Hauptkategorie = item.Maincategory.Name,
                     Unterkategorie = item.Subcategory.Name,
-                    Titel = item.Title
+                    Titel = item.Title,
+                    ToDos = item.ToDos?.Select(x =>
+                    new ToDoViewModel { Id = x.Id, DocId = x.DocId, Beschreibung = x.Details, Titel = x.Title, Erledigt = x.Done, Faelligkeit = x.DueDate.Value.ToString("dd.MM.yyyy") }).ToList() ?? new List<ToDoViewModel>(),
                 });
             }
 
             return returnlist;
 
+
+        }
+        public async Task AddToDo(Guid docId)
+        {
+            ToDo newTodo = new ToDo { DocId = docId };
+
+            await _documentContext.ToDos.AddAsync(newTodo);
+
+            await _documentContext.SaveChangesAsync();
+        }
+        public async Task AddMetaData(string name, Guid docId)
+        {
+            DocumentDb.Models.Metadata newMetadata = new DocumentDb.Models.Metadata { Description = name, DocId = docId };
+
+            await _documentContext.Metadata.AddAsync(newMetadata);
+
+            await _documentContext.SaveChangesAsync();
 
         }
         public DocumentViewModel ParseGPTText(string documentText)
@@ -83,19 +114,29 @@ namespace MVCAI.Models
             else
             {
                 doc.Title = documentVM.Titel;
-
+                doc.MaincategoryId = mainCatId;
+                doc.SubcategoryId = subCatId;
             }
 
             await _documentContext.SaveChangesAsync();
 
             documentVM.Id = doc.Id;
-            
+
             documentVM.Metadaten = await SaveMetadata(documentVM.Metadaten, documentVM.Id);
             documentVM.ToDos = await SaveToDos(documentVM.ToDos, documentVM.Id);
             return documentVM;
 
         }
+        public async Task SetToDoDone(Guid id)
+        {
+            var todoItem = await _documentContext.ToDos.FindAsync(id);
 
+            if(todoItem == null) { return; }
+
+            todoItem.Done = true;
+            _documentContext.Update(todoItem);
+            var rows = await _documentContext.SaveChangesAsync();
+        }
         public async Task<DocumentViewModel> GetDocument(Guid id)
         {
             var doc = await _documentContext.Documents.FindAsync(id);
@@ -103,7 +144,7 @@ namespace MVCAI.Models
             var subCat = await _documentContext.Subcategories.FindAsync(doc.SubcategoryId);
 
             var metadataList = await _documentContext.Metadata.Where(x => x.DocId == doc.Id).Select(x => new MetadataViewModel { Name = x.Description, Details = x.Details, Id = x.Id }).ToListAsync();
-            var todoList = await _documentContext.ToDos.Where(x => x.DocId == doc.Id).Select(x => new ToDoViewModel { Titel = x.Title, Beschreibung = x.Details, Id = x.Id, Erledigt = x.Done, Faelligkeit = x.DueDate.ToString("dd.MM.yyyy") }).ToListAsync();
+            var todoList = await _documentContext.ToDos.Where(x => x.DocId == doc.Id).Select(x => new ToDoViewModel { Titel = x.Title, Beschreibung = x.Details, Id = x.Id, DocId = x.DocId, Erledigt = x.Done, Faelligkeit = x.DueDate.Value.ToString("dd.MM.yyyy") }).ToListAsync();
             return new DocumentViewModel
             {
                 Id = doc.Id,
@@ -115,7 +156,18 @@ namespace MVCAI.Models
                 Titel = doc.Title
             };
         }
+        public async Task DeleteTodo(Guid id)
+        {
+            var todoItem = await _documentContext.ToDos.FindAsync(id);
 
+            if(todoItem == null){
+                return;
+            }
+
+            _documentContext.ToDos.Remove(todoItem);
+
+            await _documentContext.SaveChangesAsync();
+        }
         public async Task<bool> RemoveMetadata(Guid metaDataid)
         {
             var metadata = await _documentContext.Metadata.FindAsync(metaDataid);
@@ -139,7 +191,7 @@ namespace MVCAI.Models
         }
         private async Task<List<ToDoViewModel>> SaveToDos(List<ToDoViewModel> todos, Guid docId)
         {
-            if(todos == null)
+            if (todos == null)
             {
                 return new List<ToDoViewModel>();
             }
@@ -162,6 +214,10 @@ namespace MVCAI.Models
                     todoItem.Details = item.Beschreibung;
                     todoItem.Title = item.Titel;
                     todoItem.Done = item.Erledigt;
+                    if (DateTime.TryParse(item.Faelligkeit, out var date))
+                    {
+                        todoItem.DueDate = date;
+                    }
                     _documentContext.ToDos.Update(todoItem);
                 }
             }
@@ -169,7 +225,7 @@ namespace MVCAI.Models
             await _documentContext.SaveChangesAsync();
 
             var newMetadataDb =
-                await _documentContext.ToDos.Where(x => x.DocId == docId).Select(x => new ToDoViewModel { Titel = x.Title, Beschreibung = x.Details, Id = x.Id, Faelligkeit = x.DueDate.ToString("dd.MM.yyyy"), Erledigt = x.Done }).ToListAsync();
+                await _documentContext.ToDos.Where(x => x.DocId == docId).Select(x => new ToDoViewModel { Titel = x.Title, Beschreibung = x.Details, Id = x.Id, Faelligkeit = x.DueDate.Value.ToString("dd.MM.yyyy"), Erledigt = x.Done }).ToListAsync();
             return newMetadataDb;
         }
         private async Task<List<MetadataViewModel>> SaveMetadata(List<MetadataViewModel> metadata, Guid docId)

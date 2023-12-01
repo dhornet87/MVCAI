@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DocumentDb.Migrations
 {
     [DbContext(typeof(DocumentDbContext))]
-    [Migration("20231129130817_InitialCreate")]
+    [Migration("20231201093325_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -87,12 +87,9 @@ namespace DocumentDb.Migrations
                     b.Property<Guid>("DocId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("DocumentId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("DocumentId");
+                    b.HasIndex("DocId");
 
                     b.ToTable("Metadata");
                 });
@@ -126,13 +123,10 @@ namespace DocumentDb.Migrations
                     b.Property<Guid>("DocId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("DocumentId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<bool>("Done")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("DueDate")
+                    b.Property<DateTime?>("DueDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
@@ -141,7 +135,7 @@ namespace DocumentDb.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DocumentId");
+                    b.HasIndex("DocId");
 
                     b.ToTable("ToDos");
                 });
@@ -167,16 +161,24 @@ namespace DocumentDb.Migrations
 
             modelBuilder.Entity("DocumentDb.Models.Metadata", b =>
                 {
-                    b.HasOne("DocumentDb.Models.Document", null)
+                    b.HasOne("DocumentDb.Models.Document", "Document")
                         .WithMany("Metadatas")
-                        .HasForeignKey("DocumentId");
+                        .HasForeignKey("DocId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Document");
                 });
 
             modelBuilder.Entity("DocumentDb.Models.ToDo", b =>
                 {
-                    b.HasOne("DocumentDb.Models.Document", null)
+                    b.HasOne("DocumentDb.Models.Document", "Document")
                         .WithMany("ToDos")
-                        .HasForeignKey("DocumentId");
+                        .HasForeignKey("DocId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Document");
                 });
 
             modelBuilder.Entity("DocumentDb.Models.Document", b =>

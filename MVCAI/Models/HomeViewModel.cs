@@ -9,7 +9,7 @@ namespace MVCAI.Models
 
         public List<DocumentViewModel> Documents { get; set; }
 
-
+        public List<ToDoViewModel> ToDos { get; set; }
 
     }
 

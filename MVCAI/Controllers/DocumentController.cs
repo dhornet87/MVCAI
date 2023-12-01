@@ -20,8 +20,17 @@ namespace MVCAI.Controllers
             var vm = await docModel.GetDocument(id);
             return View(vm);
         }
-        public async Task AddMetadata()
+        public async Task<IActionResult> AddMetadata(string metadataNamePlatzhalter, Guid docId)
         {
+            if(string.IsNullOrEmpty(metadataNamePlatzhalter))
+            {
+                return RedirectToAction("Index", new { id = docId });
+            }
+            var docModel = new DocumentModel(_documentContext);
+
+            await docModel.AddMetaData(metadataNamePlatzhalter, docId);
+
+            return RedirectToAction("Index", new { id = docId });
 
         }
         public async Task<IActionResult> Delete(Guid docId, Guid metadataId)
@@ -47,11 +56,31 @@ namespace MVCAI.Controllers
             var docModel = new DocumentModel(_documentContext);
 
             _ = await docModel.Save(vm);
-            var vmHome = new HomeViewModel();
+            //var vmHome = new HomeViewModel();
 
-            vmHome.Documents = await docModel.GetDocuments();
-            return RedirectToAction("Index", "Home");
-            //return View("Index",vmHome);
+            //vmHome.Documents = await docModel.GetDocuments();
+            return RedirectToAction("Index", new { id = id });
+
+        }
+
+        public async Task<IActionResult> AddTodo(Guid id)
+        {
+            var docModel = new DocumentModel(_documentContext);
+
+            await docModel.AddToDo(id);
+
+            return RedirectToAction("Index", new { id = id });
+
+        }
+
+        public async Task<IActionResult> DeleteTodo(Guid docId, Guid todoId)
+        {
+            var docModel = new DocumentModel(_documentContext);
+
+            await docModel.DeleteTodo(todoId);
+
+            return RedirectToAction("Index", new { id = docId });
+
         }
     }
 }

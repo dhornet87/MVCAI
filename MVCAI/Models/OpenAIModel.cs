@@ -8,7 +8,7 @@ namespace MVCAI.Models
     public class OpenAIModel
     {
 
-        public static async Task<DocumentViewModel> QueryGPT(string query, string kategorie)
+        public static async Task<DocumentViewModel> QueryGPT(string query)
         {
 
         string baseproxyUrl = "https://aoai.hacktogether.net";
@@ -29,8 +29,8 @@ namespace MVCAI.Models
                 NucleusSamplingFactor = 0.95f,
                 DeploymentName = "gpt-35-turbo"
             };
-            completionsOptions.Messages.Add(new ChatMessage(ChatRole.System, "Du bist ein deutscher, freundlicher, persönlicher Assistent, welcher Dokumente sortiert und analysiert." +
-                $"Du bekommst hierbei das ganze Dokument als Text, welches der Kategorie {kategorie} zugehört und gibst dann als Antwort im Json Format zuerst den \"Titel\" und dann die \"Unterkategorie\" zurück. " +
+            completionsOptions.Messages.Add(new ChatMessage(ChatRole.System, "Du bist ein freundlicher, persönlicher Assistent, welcher Dokumente sortiert und analysiert." +
+                $"Du bekommst hierbei das ganze Dokument als Text, gibst dann als Antwort im Json Format zuerst den \"Titel\", die \"Hauptkategorie\" und dann die \"Unterkategorie\" zurück. " +
                 $"Außerdem gibst du dann die \"Metadaten\" des Dokuments als Array, welcher aus Objekten besteht mit den Attributen \"Name\" und \"Details\" wieder." +
                 $"Am Schluss kannst du noch notwendige Tätigkeiten, die sich aus dem Dokument ergeben anfügen. Dies kennzeichnest du mit einem weiteren Array \"ToDos\", welcher aus Objekten besteht mit den Attributen \"Titel\", \"Beschreibung\" und \"Faelligkeit\" als Datum."));
             completionsOptions.Messages.Add(new ChatMessage(ChatRole.User, query));

@@ -8,59 +8,103 @@
 @using (Html.BeginForm("QueryChatGPT", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     <div class="d-flex flex-column justify-content-center align-items-center">
-        <h2>Upload</h2>
+        <h2>DocumentsAI</h2>
+        <p class="text-center">
+            You can upload your scanned .tiff Files and ChatGPT will categorize and analyze this Documents for you.
+            Afterwards you still can make changes.
+            Feel free and try it out!
+        </p>
+        <input asp-for="Dateiupload" type="file" required class="form-control">
 
-        <input asp-for="Dateiupload" type="file" class="mt-5">
-
-        <button type="submit" class="mt-5 bg-primary text-white">Submit</button>
+        <button type="submit" class="btn btn-outline-primary mt-5 mb-10">Submit</button>
     </div>
 
 
 
 }
-<div class="mt-10">
-    <table class="table">
-        <thead class="table-dark">
+<div class="d-flex flex-row justify-content-center pt-20">
+    <fieldset class="border rounded-3 p-3 mr-5">
+        <legend class="float-none w-auto px-3">Documents</legend>
+    <table class="table mt-20">
+        <thead class="table">
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">Titel</th>
-                <th scope="col">Kategorie</th>
+                <th scope="col">Title</th>
+                <th scope="col">Category</th>
+                <th scope="col">Subcategory</th>
                 <th scope="col">Actions</th>
             </tr>
         </thead>
         <tbody>
             @for (int i = 0; i < Model.Documents.Count; i++)
             {
-                <tr>
-                    <th scope="row">@(i + 1)</th>
+                <tr class="table">
+                    <td>@(i + 1)</td>
                     <td>@Model.Documents[i].Titel</td>
                     <td>@Model.Documents[i].Hauptkategorie</td>
+                    <td>@Model.Documents[i].Unterkategorie</td>
                     <td>
-                        @Html.ActionLink("View", "Index", "Document", new { id = Model.Documents[i].Id })
-                        @Html.ActionLink("Delete", "DeleteDocument", "Home", new { docId = Model.Documents[i].Id })
+                        @Html.ActionLink("View", "Index", "Document", new { id = Model.Documents[i].Id }, new { @class = "bi-file-earmark-medical-fill" })
                     </td>
-                    
-                        <table class="table">
+                @* <tr class="table-secondary">
+                    <td colspan="5">
+
+                        <table class="table pl-10">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
-                                    <th scope="col">Titel</th>
-                                    <th scope="col">Beschreibung</th>
-                                    <th scope="col">Faelligkeit</th>
-                                    <th scope="col">Erledigt</th>
+                                    <th scope="col">Title</th>
+                                    <th scope="col">Description</th>
+                                    <th scope="col">Duedate</th>
+                                    <th scope="col">Done</th>
                                 </tr>
                             </thead>
                             <tbody>
-                            @for (int j = 0; j < @Model.Documents[i].ToDos.Count; j++)
-                            {
-                                <tr>
-
-                                </tr>
-                    }
-                                </tbody>
+                                    @for (int j = 0; j < @Model.Documents[i].ToDos.Count; j++)
+                                    {
+                                    <tr>
+                                        <td>@(j + 1)</td>
+                                        <td>@Model.Documents[i].ToDos[j].Titel</td>
+                                        <td>@Model.Documents[i].ToDos[j].Beschreibung</td>
+                                        <td>@Model.Documents[i].ToDos[j].Faelligkeit</td>
+                                        <td><input disabled type="checkbox" value="@Model.Documents[i].ToDos[j].Erledigt"></td>
+                                    </tr>
+                                    }
+                            </tbody>
                         </table>
+                    </td>
+                </tr> *@
                 </tr>
             }
         </tbody>
     </table>
+    </fieldset>
+    <fieldset class="border rounded-3 p-3">
+        <legend class="float-none w-auto px-3">ToDos</legend>
+    <ul class="list-group list-group-flush">
+        @for (int i = 0; i < @Model.ToDos.Count; i++)
+        {
+            <li class="list-group-item">
+                <div class="card">
+                    <form>
+                            <input type="hidden" asp-for="@Model.ToDos[i].DocId" value="@Model.ToDos[i].DocId" />
+                    <div class="card-body">
+                        <h5 class="card-title">@Model.ToDos[i].Titel</h5>
+                        <p class="card-text">@Model.ToDos[i].Beschreibung</p>
+                                <div class="form-check">
+                                    <input readonly class="form-check-input" type="checkbox" value="@Model.ToDos[i].Erledigt" id="flexCheckDefault" checked="@Model.ToDos[i].Erledigt">
+                                    <label class="form-check-label" for="flexCheckDefault">
+                                        Done
+                                    </label>
+                                </div>
+                            <button type="submit" class="card-link btn btn-outline-primary" asp-action="ViewDocument" asp-controller="Home" asp-route-id="@Model.ToDos[i].DocId">View Document</button>
+                        <button type="submit" class="card-link btn btn-outline-primary" asp-action="ToDoDone" asp-controller="Home" asp-route-id="@Model.ToDos[i].Id">Done!</button>
+                    </div>
+                        </form>
+                </div>
+            </li>
+        }
+        
+    </ul>
+    </fieldset>
 </div>
