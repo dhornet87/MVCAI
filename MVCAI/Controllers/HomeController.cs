@@ -49,8 +49,6 @@ namespace MVCAI.Controllers
         {
             
             var newQuery = new OpenAIModel();
-            var maincategories = await _documentContext.Maincategories.ToListAsync();
-            await _documentContext.SaveChangesAsync();
             
 
             var fs = new MemoryStream();

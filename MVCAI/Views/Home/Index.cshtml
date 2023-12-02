@@ -25,86 +25,89 @@
 <div class="d-flex flex-row justify-content-center pt-20">
     <fieldset class="border rounded-3 p-3 mr-5">
         <legend class="float-none w-auto px-3">Documents</legend>
-    <table class="table mt-20">
-        <thead class="table">
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Title</th>
-                <th scope="col">Category</th>
-                <th scope="col">Subcategory</th>
-                <th scope="col">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (int i = 0; i < Model.Documents.Count; i++)
-            {
-                <tr class="table">
-                    <td>@(i + 1)</td>
-                    <td>@Model.Documents[i].Titel</td>
-                    <td>@Model.Documents[i].Hauptkategorie</td>
-                    <td>@Model.Documents[i].Unterkategorie</td>
-                    <td>
-                        @Html.ActionLink("View", "Index", "Document", new { id = Model.Documents[i].Id }, new { @class = "bi-file-earmark-medical-fill" })
-                    </td>
-                @* <tr class="table-secondary">
-                    <td colspan="5">
-
-                        <table class="table pl-10">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Title</th>
-                                    <th scope="col">Description</th>
-                                    <th scope="col">Duedate</th>
-                                    <th scope="col">Done</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                    @for (int j = 0; j < @Model.Documents[i].ToDos.Count; j++)
-                                    {
-                                    <tr>
-                                        <td>@(j + 1)</td>
-                                        <td>@Model.Documents[i].ToDos[j].Titel</td>
-                                        <td>@Model.Documents[i].ToDos[j].Beschreibung</td>
-                                        <td>@Model.Documents[i].ToDos[j].Faelligkeit</td>
-                                        <td><input disabled type="checkbox" value="@Model.Documents[i].ToDos[j].Erledigt"></td>
-                                    </tr>
-                                    }
-                            </tbody>
-                        </table>
-                    </td>
-                </tr> *@
+        <table class="table mt-20">
+            <thead class="table">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Subcategory</th>
+                    <th scope="col">Actions</th>
                 </tr>
-            }
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Documents.Count; i++)
+                {
+                    <tr class="table-primary" >
+                        <td>@(i + 1)</td>
+                        <td>@Model.Documents[i].Titel</td>
+                        <td>@Model.Documents[i].Hauptkategorie</td>
+                        <td>@Model.Documents[i].Unterkategorie</td>
+                        <td>
+                            @Html.ActionLink("View", "Index", "Document", new { id = Model.Documents[i].Id }, new { @class = "btn btn-outline-primary bi-file-earmark-medical-fill" })
+                            <button type="button" data-toggle="collapse" data-target="#details2" class="btn btn-outline-primary bi bi-list-task"> Details</button>
+                        </td>
+                    <tr class="table-light collapse" id="details2">
+                        <td colspan="5">
+
+
+                            <table class="table pl-10">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"></th>
+                                        <th scope="col"></th>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Description</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                            @for (int j = 0; j < @Model.Documents[i].Metadaten.Count; j++)
+                                            {
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td>@(j + 1)</td>
+                                            <td>@Model.Documents[i].Metadaten[j].Name</td>
+                                            <td>@Model.Documents[i].Metadaten[j].Details</td>
+                                        </tr>
+                                            }
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    </tr>
+                }
         </tbody>
     </table>
     </fieldset>
-    <fieldset class="border rounded-3 p-3">
-        <legend class="float-none w-auto px-3">ToDos</legend>
+<fieldset class="border rounded-3 p-3">
+    <legend class="float-none w-auto px-3">ToDos</legend>
     <ul class="list-group list-group-flush">
-        @for (int i = 0; i < @Model.ToDos.Count; i++)
-        {
+            @for (int i = 0; i < @Model.ToDos.Count; i++)
+            {
             <li class="list-group-item">
                 <div class="card">
                     <form>
-                            <input type="hidden" asp-for="@Model.ToDos[i].DocId" value="@Model.ToDos[i].DocId" />
-                    <div class="card-body">
-                        <h5 class="card-title">@Model.ToDos[i].Titel</h5>
-                        <p class="card-text">@Model.ToDos[i].Beschreibung</p>
-                                <div class="form-check">
-                                    <input readonly class="form-check-input" type="checkbox" value="@Model.ToDos[i].Erledigt" id="flexCheckDefault" checked="@Model.ToDos[i].Erledigt">
-                                    <label class="form-check-label" for="flexCheckDefault">
-                                        Done
-                                    </label>
-                                </div>
+                        <input type="hidden" asp-for="@Model.ToDos[i].DocId" value="@Model.ToDos[i].DocId" />
+                        <div class="card-body">
+                            <h5 class="card-title">@Model.ToDos[i].Titel</h5>
+                            <p class="card-text">@Model.ToDos[i].Beschreibung</p>
+                            <div class="form-check">
+                                <input readonly class="form-check-input" type="checkbox" value="@Model.ToDos[i].Erledigt" id="flexCheckDefault" checked="@Model.ToDos[i].Erledigt">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                    Done
+                                </label>
+                            </div>
                             <button type="submit" class="card-link btn btn-outline-primary" asp-action="ViewDocument" asp-controller="Home" asp-route-id="@Model.ToDos[i].DocId">View Document</button>
-                        <button type="submit" class="card-link btn btn-outline-primary" asp-action="ToDoDone" asp-controller="Home" asp-route-id="@Model.ToDos[i].Id">Done!</button>
-                    </div>
-                        </form>
+                            <button type="submit" class="card-link btn btn-outline-primary" asp-action="ToDoDone" asp-controller="Home" asp-route-id="@Model.ToDos[i].Id">Done!</button>
+                        </div>
+                    </form>
                 </div>
             </li>
-        }
-        
+            }
+
     </ul>
-    </fieldset>
+</fieldset>
 </div>

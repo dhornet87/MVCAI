@@ -36,6 +36,7 @@ namespace MVCAI.Models
                     Hauptkategorie = item.Maincategory.Name,
                     Unterkategorie = item.Subcategory.Name,
                     Titel = item.Title,
+                    Metadaten = item.Metadatas?.Select(x => new MetadataViewModel { Name = x.Description, Details = x.Details, Id = x.Id }).ToList() ?? new List<MetadataViewModel>(),
                     ToDos = item.ToDos?.Select(x =>
                     new ToDoViewModel { Id = x.Id, DocId = x.DocId, Beschreibung = x.Details, Titel = x.Title, Erledigt = x.Done, Faelligkeit = x.DueDate.Value.ToString("dd.MM.yyyy") }).ToList() ?? new List<ToDoViewModel>(),
                 });
