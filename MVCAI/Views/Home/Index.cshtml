@@ -70,7 +70,7 @@
                                             <td></td>
                                             <td>@(j + 1)</td>
                                             <td>@Model.Documents[i].Metadaten[j].Name</td>
-                                            <td>@Model.Documents[i].Metadaten[j].Details</td>
+                                            @* <td>@Model.Documents[i].Metadaten[j].Details</td> *@
                                         </tr>
                                             }
                                 </tbody>
@@ -101,7 +101,7 @@
                                 </label>
                             </div>
                             <button type="submit" class="card-link btn btn-outline-primary" asp-action="ViewDocument" asp-controller="Home" asp-route-id="@Model.ToDos[i].DocId">View Document</button>
-                            <button type="submit" class="card-link btn btn-outline-primary" asp-action="ToDoDone" asp-controller="Home" asp-route-id="@Model.ToDos[i].Id">Done!</button>
+                            <button disabled type="submit" class="card-link btn btn-outline-primary" asp-action="ToDoDone" asp-controller="Home" asp-route-id="@Model.ToDos[i].Id">Done!</button>
                         </div>
                     </form>
                 </div>

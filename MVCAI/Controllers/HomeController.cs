@@ -4,6 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using MVCAI.Models;
 using MVCAI.Services;
 using System.Diagnostics;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Formats.Tiff;
 
 namespace MVCAI.Controllers
 {
@@ -54,12 +58,11 @@ namespace MVCAI.Controllers
             var fs = new MemoryStream();
 
                 await vm.Dateiupload.CopyToAsync(fs);
+            fs.Position = 0;
+            var pngFile = Image.Load(fs);
 
-
-            //To-Do: Corrss Platform?!
-            var pngFile = System.Drawing.Image.FromStream(fs);
             var pngStream = new MemoryStream();
-            pngFile.Save(pngStream, System.Drawing.Imaging.ImageFormat.Png);
+            await pngFile.SaveAsPngAsync(pngStream);
 
 
             var service = new OCRService();
