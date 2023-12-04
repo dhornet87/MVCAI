@@ -1,5 +1,13 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-builder.AddProject<Projects.MVCAI>("mvcai");
-builder.AddSqlServerContainer("DbServer", "Start12345", 1433);
+var sql = builder.AddSqlServerContainer("DbServer", "NetHackathon8", 1433).AddDatabase("DocumentDb");
+builder.AddProject<Projects.MVCAI>("mvcai")
+    .WithReference(sql);
+
+
+//builder.AddProject<Projects.DocumentService>("documentservice");
+
+builder.AddProject<Projects.DocumentDb>("documentdb")
+    .WithReference(sql);
+
 builder.Build().Run();

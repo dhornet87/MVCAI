@@ -10,9 +10,15 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting" Version="8.0.0-preview.1.23557.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DocumentDb\DocumentDb.csproj" />
+    <ProjectReference Include="..\DocumentService\DocumentService.csproj" />
     <ProjectReference Include="..\MVCAI\MVCAI.csproj" />
   </ItemGroup>
 

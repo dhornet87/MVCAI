@@ -1,11 +1,15 @@
+using DocumentDb;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
+builder.AddSqlServerDbContext<DocumentDbContext>("DocumentDb");
 var app = builder.Build();
+
 
 app.MapDefaultEndpoints();
 
@@ -28,4 +32,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+app.MapControllerRoute(name: "document",
+    pattern: "{controller=Document}/{action=Index}/{id?}");
 app.Run();

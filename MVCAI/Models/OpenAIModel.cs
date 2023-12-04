@@ -1,13 +1,14 @@
 ﻿using Azure;
 using Azure.AI.OpenAI;
-using static System.Net.WebRequestMethods;
+using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 namespace MVCAI.Models
 {
     public class OpenAIModel
     {
 
-        public async Task<string> QueryGPT(string query)
+        public static async Task<DocumentViewModel> QueryGPT(string query)
         {
 
         string baseproxyUrl = "https://aoai.hacktogether.net";
@@ -28,15 +29,38 @@ namespace MVCAI.Models
                 NucleusSamplingFactor = 0.95f,
                 DeploymentName = "gpt-35-turbo"
             };
-
-            completionsOptions.Messages.Add(new ChatMessage(ChatRole.System, "Du bist ein freundlicher, persönlicher Assistent, welcher Dokumente sortiert. In folgende Hauptkategorien: Rechnungen, Gehaltsabrechnungen, Versicherungen, Sonstige Dokumente. Für jede Hauptkategorie kannst du beliebig weitere Unterkategorien anlegen." +
-                "Du bekommst entweder Stichworte zu einem Dokument oder das ganze Dokument als Text und gibst dann als Antwort zuerst die Hauptkategorie und dann die Subkategorie zurück. Außerdem gibst du in einer neuen Zeile die Metadaten des Dokuments in der Form Name: Information wieder."));
+            completionsOptions.Messages.Add(new ChatMessage(ChatRole.System, "Du bist ein freundlicher, persönlicher Assistent, welcher Dokumente sortiert und analysiert." +
+                $"Du bekommst hierbei das ganze Dokument als Text, gibst dann als Antwort im Json Format zuerst den \"Titel\", die \"Hauptkategorie\" und dann die \"Unterkategorie\" zurück. " +
+                $"Außerdem gibst du dann die \"Metadaten\" des Dokuments als Array, welcher aus Objekten besteht mit den Attributen \"Name\" und \"Details\" wieder." +
+                $"Am Schluss kannst du noch notwendige Tätigkeiten, die sich aus dem Dokument ergeben anfügen. Dies kennzeichnest du mit einem weiteren Array \"ToDos\", welcher aus Objekten besteht mit den Attributen \"Titel\", \"Beschreibung\" und \"Faelligkeit\" als Datum."));
             completionsOptions.Messages.Add(new ChatMessage(ChatRole.User, query));
 
             var response = await openAIClient.GetChatCompletionsAsync(completionsOptions);
             string completion = response.Value.Choices[0].Message.Content;
-            return completion;
 
+            return ParseResponse(completion);
+
+        }
+
+        private static DocumentViewModel ParseResponse(string response)
+        {
+            DocumentViewModel documentViewModel = new DocumentViewModel();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            try
+            {
+                documentViewModel =
+                         JsonSerializer.Deserialize<DocumentViewModel>(response, options);
+            }
+            catch (Exception e)
+            {
+                var exc = e;
+                throw;
+            }
+
+            return documentViewModel;
         }
     }
 }
