@@ -70,7 +70,7 @@
                                 <label for="@i">@Model.Metadaten[i].Name</label>
                             </div>
                             @* @Html.ActionLink("Delete", "Delete", "Home", new { docId = Model.Id, metadataId = Model.Metadaten[i].Id }, new { @class = " text-center btn btn-outline-primary " }) *@
-                            <button type="submit" asp-action="Delete" asp-controller="Home" asp-route-docId="@Model.Id" asp-route-metadataId="@Model.Metadaten[i].Id" class="btn btn-outline-primary bi bi-trash-fill"></button>
+                            <button onkeydown="" type="submit" asp-action="Delete" asp-controller="Home" asp-route-docId="@Model.Id" asp-route-metadataId="@Model.Metadaten[i].Id" class="btn btn-outline-primary bi bi-trash-fill"></button>
                         </div>
                     </div>
                 }

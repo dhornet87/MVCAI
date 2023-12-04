@@ -45,7 +45,7 @@
                         <td>@Model.Documents[i].Unterkategorie</td>
                         <td>
                             @Html.ActionLink("View", "Index", "Document", new { id = Model.Documents[i].Id }, new { @class = "btn btn-outline-primary bi-file-earmark-medical-fill" })
-                            <button type="button" data-toggle="collapse" data-target="#details2" class="btn btn-outline-primary bi bi-list-task"> Details</button>
+                            @* <button type="button" data-toggle="collapse" data-target="#details2" class="btn btn-outline-primary bi bi-list-task"> Details</button> *@
                         </td>
                     <tr class="table-light collapse" id="details2">
                         <td colspan="5">
@@ -70,7 +70,7 @@
                                             <td></td>
                                             <td>@(j + 1)</td>
                                             <td>@Model.Documents[i].Metadaten[j].Name</td>
-                                            @* <td>@Model.Documents[i].Metadaten[j].Details</td> *@
+                                            <td>@Model.Documents[i].Metadaten[j].Details</td>
                                         </tr>
                                             }
                                 </tbody>
@@ -95,13 +95,13 @@
                             <h5 class="card-title">@Model.ToDos[i].Titel</h5>
                             <p class="card-text">@Model.ToDos[i].Beschreibung</p>
                             <div class="form-check">
-                                <input readonly class="form-check-input" type="checkbox" value="@Model.ToDos[i].Erledigt" id="flexCheckDefault" checked="@Model.ToDos[i].Erledigt">
+                                <input disabled class="form-check-input" type="checkbox" value="@Model.ToDos[i].Erledigt" id="flexCheckDefault" checked="@Model.ToDos[i].Erledigt">
                                 <label class="form-check-label" for="flexCheckDefault">
                                     Done
                                 </label>
                             </div>
                             <button type="submit" class="card-link btn btn-outline-primary" asp-action="ViewDocument" asp-controller="Home" asp-route-id="@Model.ToDos[i].DocId">View Document</button>
-                            <button disabled type="submit" class="card-link btn btn-outline-primary" asp-action="ToDoDone" asp-controller="Home" asp-route-id="@Model.ToDos[i].Id">Done!</button>
+                            <button type="submit" class="card-link btn btn-outline-primary" asp-action="ToDoDone" asp-controller="Home" asp-route-id="@Model.ToDos[i].Id">Done!</button>
                         </div>
                     </form>
                 </div>
