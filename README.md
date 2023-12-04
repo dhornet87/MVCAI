@@ -6,7 +6,7 @@ In the first Stage you can upload .tiff files which get analysed and categorized
 
 Also you can edit/delete/add the ChatGPT generated Metadata and view the uploaded Document in a little Preview.
 
-To run this demo, clone the repo and run it in Visual Studio 2022. Also you need Docker. 
+To run this demo, clone the repo and run it in Visual Studio 2022 and set MVCAI.Apphost as Starting Project. Also you need Docker. 
 
 Hope you enjoy this little demo.
 
